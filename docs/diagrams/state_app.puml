@@ -1,0 +1,15 @@
+@startuml state_app
+hide empty description
+
+[*] --> Wakeup
+Wakeup --> Warmup
+Warmup --> Listen
+Listen -> Listen : if user is speaking
+Listen --> Transcribe : if user finished speaking
+Transcribe -> Synthesize : else
+Synthesize -> Speak
+Speak -> Listen
+Transcribe --> SayGoodbye : if transcription is "demonstrator"
+SayGoodbye --> [*]
+
+@enduml

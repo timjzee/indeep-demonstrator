@@ -1,0 +1,13 @@
+{
+    "empty_transcription_message": "Sorry, I did not understand you. Could you repeat that?",
+    "fully_unpronounceable_message": "Sorry, I cannot repeat what you just said. Let's try something else.",
+    "partially_unpronounceable_message": "Sorry, I did not understand everything you said. I did understand the following.",
+    "goodbye_texts": [
+        "Thanks for playing! The game is now over. I hope you liked it!",
+        "That was the end of the game. Thanks for participating and I'll see you next time!",
+        "The game is over. Good job, and hopefully I'll see you soon for a new round!",
+        "We're done with the game. Thank you for playing and have fun!",
+        "The game is done! Thanks for your time and I hope you enjoyed it!",
+        "That was fun! The game is now over, thanks and until next time!"
+    ]
+}

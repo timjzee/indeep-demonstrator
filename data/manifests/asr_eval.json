@@ -1,0 +1,107 @@
+[
+    {
+        "filename": "story_1_nl.wav",
+        "transcription": "Gisteren heb ik een nieuwe fiets gekocht en een lange tocht gemaakt.",
+        "type": "story"
+    },
+    {
+        "filename": "story_2_nl.wav",
+        "transcription": "Vorige week heb ik voor het eerst een taart gebakken en hij was lekker.",
+        "type": "story"
+    },
+    {
+        "filename": "story_3_nl.wav",
+        "transcription": "Ik ben net terug van een rustig weekend in de Ardennen.",
+        "type": "story"
+    },
+    {
+        "filename": "story_4_nl.wav",
+        "transcription": "Gisteren heb ik mijn oude laptop vervangen, hij werkte niet meer goed.",
+        "type": "story"
+    },
+    {
+        "filename": "story_5_nl.wav",
+        "transcription": "Ik heb onlangs een interessante online cursus fotografie gevolgd.",
+        "type": "story"
+    },
+    {
+        "filename": "story_6_nl.wav",
+        "transcription": "Gisteravond heb ik met vrienden een nieuwe horrorfilm gekeken.",
+        "type": "story"
+    },
+    {
+        "filename": "story_7_nl.wav",
+        "transcription": "Ik heb mijn woonkamer opgeknapt met nieuwe verf en meubels.",
+        "type": "story"
+    },
+    {
+        "filename": "story_8_nl.wav",
+        "transcription": "Vorige maand ben ik begonnen met schaken als nieuwe hobby.",
+        "type": "story"
+    },
+    {
+        "filename": "story_9_nl.wav",
+        "transcription": "Afgelopen weekend ben ik naar een concert van mijn favoriete band geweest.",
+        "type": "story"
+    },
+    {
+        "filename": "story_10_nl.wav",
+        "transcription": "Vanochtend heb ik mijn eerste hardloopwedstrijd gedaan en ben trots op mijn tijd.",
+        "type": "story"
+    },
+    {
+        "filename": "emotion_1_nl.wav",
+        "transcription": "Het klonk als blijdschap, want de persoon sprak echt heel enthousiast en opgewekt.",
+        "type": "emotion"
+    },
+    {
+        "filename": "emotion_2_nl.wav",
+        "transcription": "Ik denk dat het frustratie was, omdat ze veel zuchtte en heel gehaast klonk.",
+        "type": "emotion"
+    },
+    {
+        "filename": "emotion_3_nl.wav",
+        "transcription": "Het leek op verdriet, want je kon de emotie in haar stem voelen, alsof ze bijna ging huilen.",
+        "type": "emotion"
+    },
+    {
+        "filename": "emotion_4_nl.wav",
+        "transcription": "Het klonk als onzekerheid, want ze twijfelde veel en haar zinnen waren steeds niet af.",
+        "type": "emotion"
+    },
+    {
+        "filename": "emotion_5_nl.wav",
+        "transcription": "Volgens mij was het boosheid, omdat de persoon heel snel en met een scherpe toon sprak.",
+        "type": "emotion"
+    },
+    {
+        "filename": "edge_case_1_nl.wav",
+        "transcription": "Hmm, eh, tja.",
+        "type": "edge_case",
+        "notes": "Filled pauses"
+    },
+    {
+        "filename": "edge_case_2_nl.wav",
+        "transcription": "Poeh poeh, nou nou, hè hè.",
+        "type": "edge_case",
+        "notes": "Interjections, non-standard unicode"
+    },
+    {
+        "filename": "edge_case_3_nl.wav",
+        "transcription": "Tradiculeren kun je leren.",
+        "type": "edge_case",
+        "notes": "Nonsense word"
+    },
+    {
+        "filename": "edge_case_4_nl.wav",
+        "transcription": "GELACH",
+        "type": "edge_case",
+        "notes": "Laughter"
+    },
+    {
+        "filename": "edge_case_5_nl.wav",
+        "transcription": "Godverdomme, houd toch je bek, eikel!",
+        "type": "edge_case",
+        "notes": "Swear words"
+    }
+]

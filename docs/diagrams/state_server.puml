@@ -1,0 +1,16 @@
+@startuml state_server
+hide empty description
+
+[*] --> Wakeup
+Wakeup --> Warmup
+Warmup --> RESTAwait
+RESTAwait --> RESTAwait : if no request received
+RESTAwait --> Transcribe : if request received
+Transcribe --> Synthesize : else
+Synthesize --> RESTResponse
+RESTResponse -> RESTAwait
+
+Transcribe --> SayGoodbye : if transcription is "goodbye demonstrator"
+SayGoodbye --> [*]
+
+@enduml

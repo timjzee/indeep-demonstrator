@@ -1,0 +1,13 @@
+{
+    "empty_transcription_message": "Sorry, ik verstond je niet. Kan je het nog eens zeggen?",
+    "fully_unpronounceable_message": "Sorry, ik kan niet herhalen wat je zei. Laten we iets anders proberen.",
+    "partially_unpronounceable_message": "Sorry, ik heb niet alles verstaan van wat je zei. Ik begreep wel het volgende.",
+    "goodbye_texts": [
+        "Bedankt voor het spelen! Het spel is nu afgelopen. Hopelijk vond je het leuk!",
+        "Dat was het einde van het spel. Bedankt voor het meedoen en tot de volgende keer!",
+        "Het spel is voorbij. Goed gedaan en hopelijk zie ik je snel weer voor een nieuwe ronde!",
+        "We zijn klaar met het spel. Dankjewel voor het spelen en veel plezier verder!",
+        "Het spel zit erop! Bedankt voor je tijd en ik hoop dat je genoten hebt!",
+        "Dat was leuk! Het spel is nu afgelopen, bedankt en tot de volgende keer!"
+    ]
+}

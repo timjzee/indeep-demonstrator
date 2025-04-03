@@ -1,0 +1,19 @@
+asr_eval:
+  manifest: asr_eval.json
+  model_sizes:
+    - tiny
+    - base
+    - small
+    - medium
+    - large-v2
+
+asr_eval_no_edge_cases:
+  manifest: asr_eval.json
+  model_sizes:
+    - tiny
+    - base
+    - small
+    - medium
+    - large-v2
+  exclude:
+    type: edge_case

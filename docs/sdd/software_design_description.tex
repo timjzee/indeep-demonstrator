@@ -1,0 +1,48 @@
+\documentclass[twoside]{RadboudReport}
+
+\usepackage[english]{babel}      % Sets document language to English
+\usepackage{graphicx}            % Required for inserting images
+\usepackage[hidelinks]{hyperref} % Makes links in document clickable and adds
+                                 % the \href{}{} command to create hyperlinks
+
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{url}
+\usepackage[numbers]{natbib}
+\usepackage{listings}
+
+\bibliographystyle{ACM-Reference-Format}
+
+\title{Software Design Description}
+\subtitle{for the InDeep Demonstrator software}
+
+\author{Daan Brugmans (s1080742)}
+\addnameleft{\theauthor}{Intern\\Developer\\\texttt{daan.brugmans@ru.nl}}
+\addnameright{dr. Iris Hendrickx}{Primary Assessor\\Daily Supervisor}
+\addnameright{dr. Maarten van Gompel}{Daily Supervisor}
+
+\date{\today}
+
+\coverabstract{
+    This document constitues the Software Design Description (SDD) for the InDeep Demonstrator software.
+    The goal of this document is to be a reference for any future developers and technically knowledgeable users that wish to use or expand the Demonstrators functionalities.
+    The contents of this document are on the design and implementation of the Demonstrator software; how it is constructed, why it is constructed the way it is, and how it can be used.
+    First, a general architectural overview of the system is given, and then the individual components of this system are further touched upon.
+    The code for the Demonstrator software can be found at the following GitHub address: \url{https://github.com/daanbrugmans/indeep-demonstrator}.
+}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{}
+%     \caption{}
+%     \label{fig:}
+% \end{figure}
+
+\include{sdd_contents}
+
+\end{document}

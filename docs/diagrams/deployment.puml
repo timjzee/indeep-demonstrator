@@ -1,0 +1,30 @@
+@startuml deployment
+
+actor end_user as "End User"
+package demonstrator as "Demonstrator" {
+    cloud ponyland as "Ponyland (Thunderlane/Lightning)" {
+        component server as "Server" {
+            agent asr_model as "ASR Model"
+            agent api as "RESTful API"
+            agent tts_model as "TTS Model"
+        }
+    }
+    component client as "Client" {
+        agent vad_model as "VAD Model"
+        agent audio_player as "Audio Player"
+        agent request as "Client Request"
+    }
+}
+
+end_user -up-> vad_model : "1: User Speaks to Demonstrator"
+vad_model -> vad_model : "2: Listen until Speaker Finished"
+vad_model -up-> request : "3: Prepare API Request"
+request -up--> api : "4: <b>POST</b> User Speech Audio"
+api -up--> asr_model : "5: Transcribe User Utterance"
+asr_model -left-> tts_model : "6: Synthesize Transcription"
+tts_model -down--> api : "7: Synthesized Speech"
+api -down-> request : "8: <b>RETURN</b> Synthesized Speech Audio"
+request -left-> audio_player : "9: Synthesized Speech Audio"
+audio_player -down--> end_user : "10: Play Synthesized Speech"
+
+@enduml

@@ -1,0 +1,14 @@
+@startuml state_client
+hide empty description
+
+[*] --> Wakeup
+Wakeup --> Listen
+Listen --> Listen : if user is speaking
+Listen --> RESTRequest : if user finished speaking
+RESTRequest --> RESTRequest : if no response received
+RESTRequest --> Speak : if response received
+Speak -> Listen : else
+Speak -left> SayGoodbye : if transcription is "demonstrator"
+SayGoodbye --> [*]
+
+@enduml

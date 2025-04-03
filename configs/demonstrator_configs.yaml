@@ -1,0 +1,45 @@
+seed: 3131
+threads: 16
+host_ip: "127.0.0.1"
+host_port: 8031
+
+# Language codes adhere to OpenAI's Whisper language codes: https://github.com/openai/whisper/blob/c5d42560760a05584c1c79546a098287e5a771eb/whisper/tokenizer.py
+
+app:
+  default:
+    language: nl
+    asr:
+      name: whisper
+      model_size: medium
+    tts:
+      name: mms
+    vad:
+      name: silero
+
+server:
+  default:
+    language: nl
+    asr:
+      name: whisper
+      model_size: medium 
+    tts:
+      name: piper
+  whisper_large_english:
+    language: en
+    asr:
+      name: whisper
+      model_size: large-v2
+    tts:
+      name: piper
+  whisper_medium_with_mms_tts:
+    language: nl
+    asr:
+      name: whisper
+      model_size: medium
+    tts:
+      name: mms_tts
+
+client:
+  default:
+    vad:
+      name: silero
