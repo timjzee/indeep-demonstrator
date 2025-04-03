@@ -1,5 +1,20 @@
 # InDeep Demonstrator 🦜
 
+## To Do
+- Base SER implementation:
+  - create alternative mode in which the client idles (is not listening) until a button is pressed
+  - add explanation: "I think you said:" + recognized text
+  - add SER functionality
+    - use either [ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition](https://huggingface.co/ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition)
+    - or [speechbrain/emotion-recognition-wav2vec2-IEMOCAP](https://huggingface.co/speechbrain/emotion-recognition-wav2vec2-IEMOCAP)
+  - print out result server side
+  - add SER probability to explanation: "And I'm PERCENTAGE sure you sounded MOST_PROBABLE_EMOTION."
+- Bonus TTS + emotion control
+  - add [Parler-TTS Mini: Expresso](https://huggingface.co/parler-tts/parler-tts-mini-expresso) as a TTS model
+  - control emotion based on SER
+  - Different response: "I'm PERCENTAGE sure you did not sound LEAST_PROBABLE_EMOTION. Because then you would have said: + emotional TTS of recognized text"
+
+
 [![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
 
 This repository contains all code and documentation relevant to the Demonstrator software that can be made public, and is the end product of a Research Internship performed by [Daan Brugmans](https://github.com/daanbrugmans) at the [Radboud University](https://www.ru.nl/en)'s [Centre of Language and Speech Technology](https://www.ru.nl/en/cls/clst) department.
