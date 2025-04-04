@@ -44,13 +44,15 @@ class DemonstratorClient(Demonstrator):
         api_url: The URL to which RESTful API calls are made to the server.
     """
 
-    def __init__(self, vad_model: VADModel, playback_module: PlaybackModule):
+    def __init__(self, vad_model: VADModel, playback_module: PlaybackModule, activation: str):
         super().__init__()
         
         self.vad_model: VADModel = vad_model
         self.playback_module: PlaybackModule = playback_module
         
         self.api_url: str
+
+        self.activation: str = activation
 
 class DemonstratorServer(Demonstrator):
     """The Server implementation of the Demonstrator, which transcribes and synthesizes the audio given by a Client Demonstrator.
@@ -79,13 +81,15 @@ class DemonstratorApp(Demonstrator):
         playback_module: The module used for playing back audio.
     """
 
-    def __init__(self, vad_model: VADModel, asr_model: ASRModel, tts_model: TTSModel, playback_module: PlaybackModule) -> None:
+    def __init__(self, vad_model: VADModel, asr_model: ASRModel, tts_model: TTSModel, playback_module: PlaybackModule, activation: str) -> None:
         super().__init__()
         
         self.vad_model: VADModel = vad_model
         self.asr_model: ASRModel = asr_model
         self.tts_model: TTSModel = tts_model
         self.playback_module: PlaybackModule = playback_module
+
+        self.activation: str = activation
             
 class DemonstratorFactory:
     """A factory for creating Demonstrator instances based on a YAML configuration file.
@@ -116,6 +120,8 @@ class DemonstratorFactory:
         self.asr_model: ASRModel = None
         self.tts_model: TTSModel = None
         
+        self.activation: str = None
+        
     def create_demonstrator(self) -> Demonstrator:
         """Instantiates a Demonstrator class instance based on the configurations found in the `/configs/demonstrator_configs.yaml` and `.env` files.
 
@@ -133,7 +139,8 @@ class DemonstratorFactory:
                 vad_model=self.vad_model,
                 asr_model=self.asr_model,
                 tts_model=self.tts_model,
-                playback_module=PlaybackModule()
+                playback_module=PlaybackModule(),
+                activation=self.activation
             )     
         elif self.mode == "server":           
             self.demonstrator = DemonstratorServer(
@@ -144,6 +151,7 @@ class DemonstratorFactory:
             self.demonstrator = DemonstratorClient(
                 vad_model=self.vad_model,
                 playback_module=PlaybackModule(),
+                activation=self.activation
             )
         else:
             raise ValueError(f"Value of Demonstrator mode is invalid. Should be 'app', 'server', or 'client', but found {self.mode}.")
@@ -175,4 +183,7 @@ class DemonstratorFactory:
                 
             if self.config["tts"]["name"] == "piper":
                 self.tts_model = Piper(device=self.device, language=language)
+        
+        if "activation" in self.config.keys():
+            self.activation = self.config["activation"]
         

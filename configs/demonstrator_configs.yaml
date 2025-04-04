@@ -15,6 +15,7 @@ app:
       name: mms
     vad:
       name: silero
+    activation: auto
 
 server:
   default:
@@ -43,3 +44,4 @@ client:
   default:
     vad:
       name: silero
+    activation: input

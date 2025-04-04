@@ -29,6 +29,22 @@ class AbstractState(ABC):
 
         raise NotImplementedError("The AbstractState is not a valid state for a client to be in. Please call an implementation of the AbstractState.")
     
+class Idle(AbstractState):
+    """Makes the demonstrator instance wait for manual input like a keypress."""
+
+    def handle(self, context: demonstrator.Demonstrator):
+        """Runs the state's logic.
+
+        Args:
+            context (demonstrator.Demonstrator): The Demonstrator instance to which the state is assigned.
+        """
+
+        print("I'm idle...")
+
+        input("Press Enter to continue...")
+        
+        context.state = Listen()
+
 class Wakeup(AbstractState):
     """The initial state all Demonstrator instances start in, which assigns the first state with logic to the instance."""
 
@@ -65,7 +81,10 @@ class Warmup(AbstractState):
             context.state = RESTAwait()
         
         if isinstance(context, demonstrator.DemonstratorApp):
-            context.state = Listen()
+            if context.activation == "auto":
+                context.state = Listen()
+            else:   # if it is "input"
+                context.state = Idle()
         
 class Listen(AbstractState):
     """Makes the Demonstrator instance listen to input audio and record any utterances.
@@ -171,7 +190,11 @@ class Speak(AbstractState):
         print("I'm speaking...")
         
         context.playback_module.playback(context.latest_tts_audio_length)
-        context.state = Listen()
+
+        if context.activation == "auto":
+            context.state = Listen()
+        else:   # if it is "input"
+            context.state = Idle()
     
 class SayGoodbye(AbstractState):
     """Instructs the Demonstrator instance to tell the end user goodbye and to then shut down the program.

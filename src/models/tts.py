@@ -119,9 +119,9 @@ class MMS(TTSModel):
         with torch.no_grad():
             speech = self.model(**tokenized_input).waveform.cpu()
         
-        torchaudio.save(self.path_to_temp_tts, speech, self.model.config.sampling_rate)
+        torchaudio.save(str(self.path_to_temp_tts), speech, self.model.config.sampling_rate)
         
-        temp_tts_info = torchaudio.info(self.path_to_temp_tts)
+        temp_tts_info = torchaudio.info(str(self.path_to_temp_tts))
         audio_length = temp_tts_info.num_frames / temp_tts_info.sample_rate
         
         return audio_length
