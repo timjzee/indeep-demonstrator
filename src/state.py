@@ -61,7 +61,10 @@ class Wakeup(AbstractState):
             context.state = Warmup()
         
         if isinstance(context, demonstrator.DemonstratorClient):
-            context.state = Listen()
+            if context.activation == "auto":
+                context.state = Listen()
+            else:   # if it is "input"
+                context.state = Idle()
     
 class Warmup(AbstractState):
     """Prepares the Demonstrator instance's ASR model for use by loading it in memory and running it once."""
