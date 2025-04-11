@@ -9,6 +9,7 @@ import state
 from models.asr import ASRModel, FasterWhisper
 from models.tts import TTSModel, MMS, Piper
 from models.vad import VADModel, SileroVAD
+from models.ser import SERModel, RAVDESS
     
 class Demonstrator(ABC):
     """Abstract base class of the Demonstrator implementations.
@@ -26,7 +27,10 @@ class Demonstrator(ABC):
         
         self.latest_user_utterance: np.ndarray | str = None
         self.latest_transcription: str
+        self.latest_text_to_synthesize: str
         self.latest_tts_audio_length: float
+        self.latest_emo_label: str
+        self.latest_emo_score: float
     
     def run(self) -> None:
         """Continuously runs a Demonstrator's current state logic.
@@ -63,11 +67,12 @@ class DemonstratorServer(Demonstrator):
         passed_server_response_barrier: A check on whether the server is allowed to send a response to the client, True when in the `RESTResponse` state.
     """
 
-    def __init__(self, asr_model: ASRModel, tts_model: TTSModel):
+    def __init__(self, asr_model: ASRModel, tts_model: TTSModel, ser_model: SERModel):
         super().__init__()
         
         self.asr_model: ASRModel = asr_model
         self.tts_model: TTSModel = tts_model
+        self.ser_model: SERModel = ser_model
 
         self.passed_server_response_barrier: bool = False
 
@@ -81,12 +86,13 @@ class DemonstratorApp(Demonstrator):
         playback_module: The module used for playing back audio.
     """
 
-    def __init__(self, vad_model: VADModel, asr_model: ASRModel, tts_model: TTSModel, playback_module: PlaybackModule, activation: str) -> None:
+    def __init__(self, vad_model: VADModel, asr_model: ASRModel, tts_model: TTSModel, ser_model: SERModel, playback_module: PlaybackModule, activation: str) -> None:
         super().__init__()
         
         self.vad_model: VADModel = vad_model
         self.asr_model: ASRModel = asr_model
         self.tts_model: TTSModel = tts_model
+        self.ser_model: SERModel = ser_model
         self.playback_module: PlaybackModule = playback_module
 
         self.activation: str = activation
@@ -119,6 +125,7 @@ class DemonstratorFactory:
         self.vad_model: VADModel = None
         self.asr_model: ASRModel = None
         self.tts_model: TTSModel = None
+        self.ser_model: SERModel = None
         
         self.activation: str = None
         
@@ -139,13 +146,15 @@ class DemonstratorFactory:
                 vad_model=self.vad_model,
                 asr_model=self.asr_model,
                 tts_model=self.tts_model,
+                ser_model=self.ser_model,
                 playback_module=PlaybackModule(),
                 activation=self.activation
             )     
         elif self.mode == "server":           
             self.demonstrator = DemonstratorServer(
                 asr_model=self.asr_model,
-                tts_model=self.tts_model
+                tts_model=self.tts_model,
+                ser_model=self.ser_model
             )
         elif self.mode == "client":
             self.demonstrator = DemonstratorClient(
@@ -183,6 +192,10 @@ class DemonstratorFactory:
                 
             if self.config["tts"]["name"] == "piper":
                 self.tts_model = Piper(device=self.device, language=language)
+        
+        if "ser" in self.config.keys():
+            if self.config["ser"]["name"] == "ravdess":
+                self.ser_model = RAVDESS(device=self.device)
         
         if "activation" in self.config.keys():
             self.activation = self.config["activation"]

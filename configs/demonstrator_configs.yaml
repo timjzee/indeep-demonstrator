@@ -7,15 +7,17 @@ host_port: 8031
 
 app:
   default:
-    language: nl
+    language: en
     asr:
       name: whisper
       model_size: medium
     tts:
       name: mms
+    ser:
+      name: ravdess
     vad:
       name: silero
-    activation: auto
+    activation: input
 
 server:
   default:
@@ -25,6 +27,8 @@ server:
       model_size: medium 
     tts:
       name: piper
+    ser:
+      name: ravdess
   whisper_large_english:
     language: en
     asr:
@@ -32,6 +36,8 @@ server:
       model_size: large-v2
     tts:
       name: piper
+    ser:
+      name: ravdess
   whisper_medium_with_mms_tts:
     language: nl
     asr:
@@ -39,9 +45,11 @@ server:
       model_size: medium
     tts:
       name: mms_tts
+    ser:
+      name: ravdess
 
 client:
   default:
     vad:
       name: silero
-    activation: input
+    activation: auto
