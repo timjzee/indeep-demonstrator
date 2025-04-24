@@ -14,6 +14,16 @@
   - control emotion based on SER
   - Different response: "I'm PERCENTAGE sure you did not sound LEAST_PROBABLE_EMOTION. Because then you would have said: + emotional TTS of recognized text"
 
+speechbrain SER model:
+```
+from speechbrain.inference.interfaces import foreign_class
+
+classifier = foreign_class(source="speechbrain/emotion-recognition-wav2vec2-IEMOCAP", pymodule_file="custom_interface.py", classname="CustomEncoderWav2vec2Classifier", run_opts={"device":"cpu"})
+
+out_prob, score, index, text_lab = classifier.classify_file("speechbrain/emotion-recognition-wav2vec2-IEMOCAP/anger.wav")
+
+```
+
 
 [![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
 
