@@ -13,6 +13,9 @@ import torch
 import torchaudio
 import transformers
 
+from parler_tts import ParlerTTSForConditionalGeneration
+import soundfile as sf
+
 try:
     import piper
 except ModuleNotFoundError:
@@ -214,3 +217,68 @@ class Piper(TTSModel):
             return "en_US-ryan-high", None
         else:
             raise ValueError(f"Language code {language} is not a supported language for the Demonstrator.")
+
+class Parler(TTSModel):
+    """A `TTSModel` implementation that uses Parler's TTS to synthesize audio.
+
+    A `TTSModel` implementation that uses Parler's TTS to synthesize audio.
+    The Parler TTS module uses relatively small neural networks to synthesize speech.
+    A Parler model is stored as a model file alongside its configuration file, and every model maps to a specific speaker voice in a specific language.
+    Different models are thus used across different languages and different speakers.
+    These files are stored in the `resources` folder (`src/resources/models/`).
+
+    Attributes:
+        model_name: The name of the Parler model used.
+        voice_id: The voice ID of the selected Parler model, which is sometimes used to select a specific speaker profile.
+        model: The loaded Parler TTS model.
+    """
+
+    def __init__(self, device: str, language: str = "nl") -> None:
+        super().__init__(device)
+        self._handle_language(language)
+        self.model_name = "parler-tts/parler-tts-mini-expresso"
+        self.voice_id = "Jerry"
+        self.model = ParlerTTSForConditionalGeneration.from_pretrained(self.model_name, attn_implementation="eager").to(device)
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name, use_fast=False)
+
+    def synthesize(self, text: str) -> float:
+        """Synthesizes the passed text as speech using the Piper TTS module.
+
+        Args:
+            text (str): The text that should be synthesized to speech.
+
+        Returns:
+            float: The length of the synthesized audio in seconds.
+        """
+
+        if not text:
+            text = self.empty_transcription_message
+
+        description = self.voice_id + " speaks in a neutral tone with clear articulation."
+
+        input_ids = self.tokenizer(description, return_tensors="pt").input_ids.to(self.device)
+        prompt_input_ids = self.tokenizer(text, return_tensors="pt").input_ids.to(self.device)
+
+        generation = self.model.generate(input_ids=input_ids, prompt_input_ids=prompt_input_ids, bos_token_id=1025, decoder_start_token_id=1025, do_sample=True, eos_token_id=1024, max_new_tokens=2580, min_new_tokens=10, pad_token_id=1024)
+
+        path_to_temp_wav = str(Path(self.path_to_temp_tts.parents[0], "temp_tts.wav"))
+        audio_arr = generation.cpu().numpy().squeeze()
+        sf.write(path_to_temp_wav, audio_arr, self.model.config.sampling_rate)
+
+        pydub.AudioSegment.from_wav(path_to_temp_wav).export(self.path_to_temp_tts, format="mp3")
+        os.remove(path_to_temp_wav)
+        
+        temp_tts_info = torchaudio.info(str(self.path_to_temp_tts))
+        audio_length = temp_tts_info.num_frames / temp_tts_info.sample_rate
+        
+        return audio_length
+
+    def _handle_language(self, language: str) -> None:
+        """Handles the language code.
+
+        Args:
+            language (str): The language in which speech will be synthesized.
+        """
+
+        if language == "nl":
+            raise ValueError(f"Language code {language} is not a supported language for the Parler TTS Model.")

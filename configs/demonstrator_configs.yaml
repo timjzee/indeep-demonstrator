@@ -21,7 +21,7 @@ app:
 
 server:
   default:
-    language: nl
+    language: en
     asr:
       name: whisper
       model_size: medium 
@@ -52,4 +52,4 @@ client:
   default:
     vad:
       name: silero
-    activation: auto
+    activation: input

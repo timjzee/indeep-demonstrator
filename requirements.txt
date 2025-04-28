@@ -25,3 +25,4 @@ typing_extensions==4.12.2
 uvicorn==0.32.0
 num2words==0.5.14
 pyobjc==11.0
+git+https://github.com/huggingface/parler-tts.git

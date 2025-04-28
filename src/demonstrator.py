@@ -7,7 +7,7 @@ import numpy as np
 
 import state
 from models.asr import ASRModel, FasterWhisper
-from models.tts import TTSModel, MMS, Piper
+from models.tts import TTSModel, MMS, Piper, Parler
 from models.vad import VADModel, SileroVAD
 from models.ser import SERModel, RAVDESS
     
@@ -31,6 +31,7 @@ class Demonstrator(ABC):
         self.latest_tts_audio_length: float
         self.latest_emo_label: str
         self.latest_emo_score: float
+        self.latest_other_label: str
     
     def run(self) -> None:
         """Continuously runs a Demonstrator's current state logic.
@@ -192,6 +193,9 @@ class DemonstratorFactory:
                 
             if self.config["tts"]["name"] == "piper":
                 self.tts_model = Piper(device=self.device, language=language)
+            
+            if self.config["tts"]["name"] == "parler":
+                self.tts_model = Parler(device=self.device, language=language)
         
         if "ser" in self.config.keys():
             if self.config["ser"]["name"] == "ravdess":
