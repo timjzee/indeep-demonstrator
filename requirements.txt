@@ -20,7 +20,7 @@ requests==2.32.3
 torch==2.3.1
 torchaudio==2.3.1
 tqdm==4.66.5
-transformers==4.44.2
+transformers>=4.44.2
 typing_extensions==4.12.2
 uvicorn==0.32.0
 num2words==0.5.14
