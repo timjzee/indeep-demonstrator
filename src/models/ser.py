@@ -76,9 +76,8 @@ class RAVDESS(SERModel):
             with open(model_file_path, 'wb') as f:
                 f.write(r.content)
 
-        device_int = int(device[-1]) if device[-1].isdigit() else -1
-        print(device_int)
-        print(device)
+        device_int = 0 if device == "cuda" else int(device[-1]) if device[-1].isdigit() else -1
+
         self.classifier = pipeline("audio-classification", model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition", device=device_int)
         self.classifier.model.projector = torch.nn.Linear(1024, 1024, bias=True)
         self.classifier.model.classifier = torch.nn.Linear(1024, 8, bias=True)
