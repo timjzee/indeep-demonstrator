@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import sys
+import os
 import string
 import time
 import copy
@@ -147,6 +148,10 @@ class Transcribe(AbstractState):
         preprocessed_transcription = preprocessed_transcription.strip().lower()
         preprocessed_transcription = preprocessed_transcription.translate(str.maketrans("", "", string.punctuation))
         
+        # here we remove temporary tts file so the tts module knows whether to concatenate synthesized audio to the existing one or not
+        if os.path.exists(context.tts_model.path_to_temp_tts):
+            os.remove(context.tts_model.path_to_temp_tts)
+
         if preprocessed_transcription == context.asr_model.goodbye_transcription:
             context.state = SayGoodbye()
         else:
@@ -193,7 +198,8 @@ class Synthesize(AbstractState):
         print("I'm synthesizing speech...")
         
         starting_timestamp = time.time()
-        audio_length = context.tts_model.synthesize(context.latest_text_to_synthesize)
+        audio_length = context.tts_model.synthesize(context.latest_text_to_synthesize) # could be changed to a faster tts mode, context.fast_tts_model
+        audio_length = context.tts_model.synthesize(context.latest_transcription)
         ending_timestamp = time.time()
         
         context.tts_model.metric_tracker.calculate_rtf(starting_timestamp, ending_timestamp, audio_length)
@@ -219,14 +225,14 @@ class Speak(AbstractState):
         
         context.playback_module.playback(context.latest_tts_audio_length)
 
-        if context.latest_text_to_synthesize != context.latest_transcription:
-            context.latest_text_to_synthesize = context.latest_transcription
-            context.state = Synthesize()
-        else:
-            if context.activation == "auto":
-                context.state = Listen()
-            else:   # if it is "input"
-                context.state = Idle()
+        #if context.latest_text_to_synthesize != context.latest_transcription:
+        #    context.latest_text_to_synthesize = context.latest_transcription
+        #    context.state = Synthesize()
+        #else:
+        if context.activation == "auto":
+            context.state = Listen()
+        else:   # if it is "input"
+            context.state = Idle()
     
 class SayGoodbye(AbstractState):
     """Instructs the Demonstrator instance to tell the end user goodbye and to then shut down the program.

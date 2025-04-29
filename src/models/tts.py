@@ -265,7 +265,13 @@ class Parler(TTSModel):
         audio_arr = generation.cpu().numpy().squeeze()
         sf.write(path_to_temp_wav, audio_arr, self.model.config.sampling_rate)
 
-        pydub.AudioSegment.from_wav(path_to_temp_wav).export(self.path_to_temp_tts, format="mp3")
+        audio = pydub.AudioSegment.from_wav(path_to_temp_wav)
+
+        if os.path.exists(self.path_to_temp_tts):
+            audio_pre = pydub.AudioSegment.from_mp3(str(self.path_to_temp_tts))
+            audio = audio_pre + audio
+
+        audio.export(self.path_to_temp_tts, format="mp3")
         os.remove(path_to_temp_wav)
         
         temp_tts_info = torchaudio.info(str(self.path_to_temp_tts))
