@@ -55,11 +55,12 @@ class TTSModel(AbstractModel):
             self.goodbye_texts = messages["goodbye_texts"]
     
     @abstractmethod
-    def synthesize(self, text: str) -> float:
+    def synthesize(self, text: str, tone: str) -> float:
         """Synthesizes the passed text using a Text-to-Speech module.
 
         Args:
             text (str): The text for which audio should be synthesized.
+            tone (str): The tone in which the text should be synthesized.
 
         Raises:
             NotImplementedError: When called, since the `TTSModel` is abstract.
@@ -98,7 +99,7 @@ class MMS(TTSModel):
         self.model = transformers.VitsModel.from_pretrained(model_name).to(device)
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
         
-    def synthesize(self, text: str) -> float:
+    def synthesize(self, text: str, tone: str) -> float:
         """Synthesizes the passed text as speech using the MMS-TTS module.
 
         Args:
@@ -172,7 +173,7 @@ class Piper(TTSModel):
         path_to_model = Path(self.path_to_resources, "models", f"{self.model_name}.onnx")
         self.model = piper.voice.PiperVoice.load(path_to_model)
         
-    def synthesize(self, text: str) -> float:
+    def synthesize(self, text: str, tone: str) -> float:
         """Synthesizes the passed text as speech using the Piper TTS module.
 
         Args:
@@ -241,11 +242,12 @@ class Parler(TTSModel):
         self.model = ParlerTTSForConditionalGeneration.from_pretrained(self.model_name, attn_implementation="eager").to(device)
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name, use_fast=False)
 
-    def synthesize(self, text: str) -> float:
+    def synthesize(self, text: str, tone: str) -> float:
         """Synthesizes the passed text as speech using the Piper TTS module.
 
         Args:
             text (str): The text that should be synthesized to speech.
+            tone (str): The tone in which the text should be synthesized.
 
         Returns:
             float: The length of the synthesized audio in seconds.
@@ -254,7 +256,7 @@ class Parler(TTSModel):
         if not text:
             text = self.empty_transcription_message
 
-        description = self.voice_id + " speaks in a neutral tone with clear articulation."
+        description = self.voice_id + " speaks in a " + tone + " tone with clear articulation."
 
         input_ids = self.tokenizer(description, return_tensors="pt").input_ids.to(self.device)
         prompt_input_ids = self.tokenizer(text, return_tensors="pt").input_ids.to(self.device)
