@@ -68,12 +68,12 @@ class DemonstratorServer(Demonstrator):
         passed_server_response_barrier: A check on whether the server is allowed to send a response to the client, True when in the `RESTResponse` state.
     """
 
-    def __init__(self, asr_model: ASRModel, tts_model: TTSModel, ser_model: SERModel):
+    def __init__(self, asr_model: ASRModel, tts_model: TTSModel, fast_tts_model: TTSModel, ser_model: SERModel):
         super().__init__()
         
         self.asr_model: ASRModel = asr_model
         self.tts_model: TTSModel = tts_model
-        self.fast_tts_model: TTSModel = tts_model
+        self.fast_tts_model: TTSModel = fast_tts_model
         self.ser_model: SERModel = ser_model
 
         self.passed_server_response_barrier: bool = False
@@ -88,13 +88,13 @@ class DemonstratorApp(Demonstrator):
         playback_module: The module used for playing back audio.
     """
 
-    def __init__(self, vad_model: VADModel, asr_model: ASRModel, tts_model: TTSModel, ser_model: SERModel, playback_module: PlaybackModule, activation: str) -> None:
+    def __init__(self, vad_model: VADModel, asr_model: ASRModel, tts_model: TTSModel, fast_tts_model: TTSModel, ser_model: SERModel, playback_module: PlaybackModule, activation: str) -> None:
         super().__init__()
         
         self.vad_model: VADModel = vad_model
         self.asr_model: ASRModel = asr_model
         self.tts_model: TTSModel = tts_model
-        self.fast_tts_model: TTSModel = tts_model
+        self.fast_tts_model: TTSModel = fast_tts_model
         self.ser_model: SERModel = ser_model
         self.playback_module: PlaybackModule = playback_module
 
