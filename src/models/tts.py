@@ -215,7 +215,7 @@ class Piper(TTSModel):
         if language == "nl":
             return "nl_BE-rdh-medium", None
         elif language == "en":
-            return "en_US-ryan-high", None
+            return "en-us-ryan-high", None
         else:
             raise ValueError(f"Language code {language} is not a supported language for the Demonstrator.")
 
