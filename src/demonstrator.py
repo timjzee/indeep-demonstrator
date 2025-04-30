@@ -202,7 +202,7 @@ class DemonstratorFactory:
             if self.config["tts"]["name"] == "parler":
                 self.tts_model = Parler(device=self.device, language=language)
         
-        self.fast_tts_model = MMS(device=self.device, language=language)
+        self.fast_tts_model = Piper(device=self.device, language=language)
         
         if "ser" in self.config.keys():
             if self.config["ser"]["name"] == "ravdess":
