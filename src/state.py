@@ -198,7 +198,7 @@ class Synthesize(AbstractState):
         print("I'm synthesizing speech...")
         
         starting_timestamp = time.time()
-        audio_length = context.tts_model.synthesize(context.latest_text_to_synthesize, "neutral") # could be changed to a faster tts mode, context.fast_tts_model
+        audio_length = context.fast_tts_model.synthesize(context.latest_text_to_synthesize, "neutral") # could be changed to a faster tts mode, context.fast_tts_model
         audio_length = context.tts_model.synthesize(context.latest_transcription, context.latest_other_label)
         ending_timestamp = time.time()
         

@@ -73,6 +73,7 @@ class DemonstratorServer(Demonstrator):
         
         self.asr_model: ASRModel = asr_model
         self.tts_model: TTSModel = tts_model
+        self.fast_tts_model: TTSModel = tts_model
         self.ser_model: SERModel = ser_model
 
         self.passed_server_response_barrier: bool = False
@@ -93,6 +94,7 @@ class DemonstratorApp(Demonstrator):
         self.vad_model: VADModel = vad_model
         self.asr_model: ASRModel = asr_model
         self.tts_model: TTSModel = tts_model
+        self.fast_tts_model: TTSModel = tts_model
         self.ser_model: SERModel = ser_model
         self.playback_module: PlaybackModule = playback_module
 
@@ -126,6 +128,7 @@ class DemonstratorFactory:
         self.vad_model: VADModel = None
         self.asr_model: ASRModel = None
         self.tts_model: TTSModel = None
+        self.fast_tts_model: TTSModel = None
         self.ser_model: SERModel = None
         
         self.activation: str = None
@@ -147,6 +150,7 @@ class DemonstratorFactory:
                 vad_model=self.vad_model,
                 asr_model=self.asr_model,
                 tts_model=self.tts_model,
+                fast_tts_model=self.fast_tts_model,
                 ser_model=self.ser_model,
                 playback_module=PlaybackModule(),
                 activation=self.activation
@@ -155,6 +159,7 @@ class DemonstratorFactory:
             self.demonstrator = DemonstratorServer(
                 asr_model=self.asr_model,
                 tts_model=self.tts_model,
+                fast_tts_model=self.fast_tts_model,
                 ser_model=self.ser_model
             )
         elif self.mode == "client":
@@ -196,6 +201,8 @@ class DemonstratorFactory:
             
             if self.config["tts"]["name"] == "parler":
                 self.tts_model = Parler(device=self.device, language=language)
+        
+        self.fast_tts_model = MMS(device=self.device, language=language)
         
         if "ser" in self.config.keys():
             if self.config["ser"]["name"] == "ravdess":
