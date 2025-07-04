@@ -138,11 +138,12 @@ class Transcribe(AbstractState):
         print("I'm transcribing...")
         
         starting_timestamp = time.time()
-        transcription, audio_length = context.asr_model.transcribe(context.latest_user_utterance)
+        transcription, audio_length, recog_lang = context.asr_model.transcribe(context.latest_user_utterance)
         ending_timestamp = time.time()
         
         context.asr_model.metric_tracker.calculate_rtf(starting_timestamp, ending_timestamp, audio_length)        
         context.latest_transcription = transcription
+        context.TTS_language = recog_lang
         
         preprocessed_transcription = copy.copy(transcription)
         preprocessed_transcription = preprocessed_transcription.strip().lower()
@@ -176,7 +177,7 @@ class RecognizeEmo(AbstractState):
         
         context.latest_emo_label = emo_label
         context.latest_emo_score = emo_score
-        context.latest_other_label = oth_label
+        context.latest_other_label = oth_label if context.tts_model.name == "parler" else "neutral"
         context.latest_text_to_synthesize = "I am {} percent certain that you sounded {}. If you were {} instead, you would have sounded like this:".format(emo_score, emo_label, oth_label)
 
         context.state = Synthesize()
@@ -198,8 +199,8 @@ class Synthesize(AbstractState):
         print("I'm synthesizing speech...")
         
         starting_timestamp = time.time()
-        audio_length = context.fast_tts_model.synthesize(context.latest_text_to_synthesize, "neutral") # could be changed to a faster tts mode, context.fast_tts_model
-        audio_length = context.tts_model.synthesize(context.latest_transcription, context.latest_other_label)
+        audio_length = context.fast_tts_model.synthesize(context.latest_text_to_synthesize, "neutral", context.TTS_language) # could be changed to a faster tts mode, context.fast_tts_model
+        audio_length = context.tts_model.synthesize(context.latest_transcription, context.latest_other_label, context.TTS_language)
         ending_timestamp = time.time()
         
         context.tts_model.metric_tracker.calculate_rtf(starting_timestamp, ending_timestamp, audio_length)

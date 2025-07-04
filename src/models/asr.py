@@ -84,11 +84,12 @@ class FasterWhisper(ASRModel):
             self.model = faster_whisper.WhisperModel(self.model_size, device="cuda", device_index=[int(device[-1])], compute_type="float32")
         else:
             self.model = faster_whisper.WhisperModel(self.model_size, device=device, compute_type="float32")
-            
-        tokenizer = faster_whisper.tokenizer.Tokenizer(tokenizer=self.model.hf_tokenizer, task="transcribe", language=self.language, multilingual=True)
+        
+        if self.language:
+            tokenizer = faster_whisper.tokenizer.Tokenizer(tokenizer=self.model.hf_tokenizer, task="transcribe", language=self.language, multilingual=True)
 
-        # Encourages FasterWhisper to transcribe numbers as words, so that the TTS can read them out loud
-        self.number_tokens = [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer.decode([i]).removeprefix(" "))]
+            # Encourages FasterWhisper to transcribe numbers as words, so that the TTS can read them out loud
+            self.number_tokens = [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer.decode([i]).removeprefix(" "))]
     
     def transcribe(self, audio: torch.Tensor | Path | str, print_transcription: bool = True) -> tuple[str, float]:
         """Transcribes a user utterance using the FasterWhisper model.
@@ -102,7 +103,11 @@ class FasterWhisper(ASRModel):
         """
 
         with torch.no_grad():
-            transcription_segments, transcription_info = self.model.transcribe(audio, language=self.language, suppress_tokens=[-1]+self.number_tokens)
+            if self.language:
+                transcription_segments, transcription_info = self.model.transcribe(audio, language=self.language, suppress_tokens=[-1]+self.number_tokens)
+            else:
+                transcription_segments, transcription_info = self.model.transcribe(audio, language=self.language)
+                print(f"Detected language: {transcription_info.language}")
             transcription = ""
         
         for segment in transcription_segments:
@@ -113,7 +118,7 @@ class FasterWhisper(ASRModel):
         if print_transcription:
             print(transcription)
         
-        return (transcription, transcription_info.duration)
+        return (transcription, transcription_info.duration, transcription_info.language)
     
     def warmup(self, print_transcription=True):
         """Loads the FasterWhisper model into memory before inference.

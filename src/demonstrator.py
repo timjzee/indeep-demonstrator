@@ -32,6 +32,7 @@ class Demonstrator(ABC):
         self.latest_emo_label: str
         self.latest_emo_score: float
         self.latest_other_label: str
+        self.TTS_language: str = None
     
     def run(self) -> None:
         """Continuously runs a Demonstrator's current state logic.
@@ -182,7 +183,7 @@ class DemonstratorFactory:
         if "language" in self.config.keys():
             language = self.config["language"]
         else:
-            language = "nl"
+            language = None
 
         if "vad" in self.config.keys():
             if self.config["vad"]["name"] == "silero":
@@ -194,15 +195,15 @@ class DemonstratorFactory:
                 
         if "tts" in self.config.keys():
             if self.config["tts"]["name"] == "mms":
-                self.tts_model = MMS(device=self.device, language=language)
+                self.tts_model = MMS(device=self.device)
                 
             if self.config["tts"]["name"] == "piper":
-                self.tts_model = Piper(device=self.device, language=language)
+                self.tts_model = Piper(device=self.device)
             
             if self.config["tts"]["name"] == "parler":
-                self.tts_model = Parler(device=self.device, language=language)
+                self.tts_model = Parler(device=self.device)
         
-            self.fast_tts_model = Piper(device=self.device, language=language)
+            self.fast_tts_model = Piper(device=self.device)
         
         if "ser" in self.config.keys():
             if self.config["ser"]["name"] == "ravdess":

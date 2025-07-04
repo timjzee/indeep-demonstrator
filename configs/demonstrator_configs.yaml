@@ -7,7 +7,6 @@ host_port: 8031
 
 app:
   default:
-    language: en
     asr:
       name: whisper
       model_size: medium
@@ -21,12 +20,11 @@ app:
 
 server:
   default:
-    language: en
     asr:
       name: whisper
       model_size: medium 
     tts:
-      name: parler
+      name: piper
     ser:
       name: ravdess
   whisper_large_english:

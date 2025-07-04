@@ -37,14 +37,14 @@ class TTSModel(AbstractModel):
         goodbye_texts: The set of messages that can be synthesized by the Demonstrator when it enters the GoodbyeState. One of these is selected at random.
     """
 
-    def __init__(self, device: str, language: str = "nl") -> None:
+    def __init__(self, device: str) -> None:
         super().__init__()
         
         self.device = device
         
         self.path_to_resources = Path(Path(__file__).parents[1], "resources")
         self.path_to_temp_tts = Path(self.path_to_resources, "audio", "temp_tts.mp3")
-        self.path_to_messages = Path(Path(__file__).parents[2], "data", "tts_messages", f"{language}.json")
+        self.path_to_messages = Path(Path(__file__).parents[2], "data", "tts_messages", "en.json")
 
         with open(self.path_to_messages, encoding="utf-8") as stream:
             messages = json.loads(stream.read())
@@ -55,7 +55,7 @@ class TTSModel(AbstractModel):
             self.goodbye_texts = messages["goodbye_texts"]
     
     @abstractmethod
-    def synthesize(self, text: str, tone: str) -> float:
+    def synthesize(self, text: str, tone: str, language: str) -> float:
         """Synthesizes the passed text using a Text-to-Speech module.
 
         Args:
@@ -90,16 +90,22 @@ class MMS(TTSModel):
         tokenizer: The MMS-TTS model's tokenizer.
     """
     
-    def __init__(self, device: str, language: str = "nl") -> None:
+    def __init__(self, device: str) -> None:
         super().__init__(device)
 
-        mms_tts_language_key = self._get_mms_tts_language_key(language)
-        model_name = f"facebook/mms-tts-{mms_tts_language_key}"
+        self.name = "mms"
+
+        mms_tts_en_key = self._get_mms_tts_language_key("en")
+        mms_tts_nl_key = self._get_mms_tts_language_key("nl")
+        model_name_en = f"facebook/mms-tts-{mms_tts_en_key}"
+        model_name_nl = f"facebook/mms-tts-{mms_tts_nl_key}"
         
-        self.model = transformers.VitsModel.from_pretrained(model_name).to(device)
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
+        self.model_en = transformers.VitsModel.from_pretrained(model_name_en).to(device)
+        self.tokenizer_en = transformers.AutoTokenizer.from_pretrained(model_name_en)
+        self.model_nl = transformers.VitsModel.from_pretrained(model_name_nl).to(device)
+        self.tokenizer_nl = transformers.AutoTokenizer.from_pretrained(model_name_nl)
         
-    def synthesize(self, text: str, tone: str) -> float:
+    def synthesize(self, text: str, tone: str, language: str) -> float:
         """Synthesizes the passed text as speech using the MMS-TTS module.
 
         Args:
@@ -108,6 +114,9 @@ class MMS(TTSModel):
         Returns:
             float: The length of the synthesized audio in seconds.
         """
+
+        tokenizer = self.tokenizer_en if language == "en" else self.tokenizer_nl
+        model = self.model_en if language == "en" else self.model_nl
 
         if not text:
             text = self.empty_transcription_message
@@ -118,12 +127,12 @@ class MMS(TTSModel):
             else:
                 text = self.partially_unpronounceable_message + text.replace("...", "")
 
-        tokenized_input = self.tokenizer(text, return_tensors="pt").to(self.device)
+        tokenized_input = tokenizer(text, return_tensors="pt").to(self.device)
                 
         with torch.no_grad():
-            speech = self.model(**tokenized_input).waveform.cpu()
+            speech = model(**tokenized_input).waveform.cpu()
         
-        torchaudio.save(str(self.path_to_temp_tts), speech, self.model.config.sampling_rate)
+        torchaudio.save(str(self.path_to_temp_tts), speech, model.config.sampling_rate)
         
         temp_tts_info = torchaudio.info(str(self.path_to_temp_tts))
         audio_length = temp_tts_info.num_frames / temp_tts_info.sample_rate
@@ -165,15 +174,20 @@ class Piper(TTSModel):
         model: The loaded Piper TTS model.
     """
 
-    def __init__(self, device: str, language: str = "nl") -> None:
+    def __init__(self, device: str) -> None:
         super().__init__(device)
+
+        self.name = "piper"
         
-        self.model_name, self.voice_id = self._get_model_name_by_language(language)
+        self.model_name_en, self.voice_id_en = self._get_model_name_by_language("en")
+        self.model_name_nl, self.voice_id_nl = self._get_model_name_by_language("nl")
         
-        path_to_model = Path(self.path_to_resources, "models", f"{self.model_name}.onnx")
-        self.model = piper.voice.PiperVoice.load(path_to_model)
+        path_to_model_en = Path(self.path_to_resources, "models", f"{self.model_name_en}.onnx")
+        self.model_en = piper.voice.PiperVoice.load(path_to_model_en)
+        path_to_model_nl = Path(self.path_to_resources, "models", f"{self.model_name_nl}.onnx")
+        self.model_nl = piper.voice.PiperVoice.load(path_to_model_nl)
         
-    def synthesize(self, text: str, tone: str) -> float:
+    def synthesize(self, text: str, tone: str, language: str) -> float:
         """Synthesizes the passed text as speech using the Piper TTS module.
 
         Args:
@@ -182,6 +196,9 @@ class Piper(TTSModel):
         Returns:
             float: The length of the synthesized audio in seconds.
         """
+        
+        model = self.model_en if language == "en" else self.model_nl
+        voice_id = self.voice_id_en if language == "en" else self.voice_id_nl
 
         if not text:
             text = self.empty_transcription_message
@@ -189,7 +206,7 @@ class Piper(TTSModel):
         path_to_temp_wav = str(Path(self.path_to_temp_tts.parents[0], "temp_tts.wav"))
         
         with wave.open(path_to_temp_wav, mode="wb") as temp_tts_wav:
-            self.model.synthesize(text, temp_tts_wav, self.voice_id)
+            model.synthesize(text, temp_tts_wav, voice_id)
         
         pydub.AudioSegment.from_wav(path_to_temp_wav).export(self.path_to_temp_tts, format="mp3")
         os.remove(path_to_temp_wav)
@@ -234,15 +251,17 @@ class Parler(TTSModel):
         model: The loaded Parler TTS model.
     """
 
-    def __init__(self, device: str, language: str = "nl") -> None:
+    def __init__(self, device: str) -> None:
         super().__init__(device)
-        self._handle_language(language)
+
+        self.name = "parler"
+
         self.model_name = "parler-tts/parler-tts-mini-expresso"
         self.voice_id = "Jerry"
         self.model = ParlerTTSForConditionalGeneration.from_pretrained(self.model_name, attn_implementation="eager").to(device)
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name, use_fast=False)
 
-    def synthesize(self, text: str, tone: str) -> float:
+    def synthesize(self, text: str, tone: str, language: str) -> float:
         """Synthesizes the passed text as speech using the Piper TTS module.
 
         Args:
@@ -280,13 +299,3 @@ class Parler(TTSModel):
         audio_length = temp_tts_info.num_frames / temp_tts_info.sample_rate
         
         return audio_length
-
-    def _handle_language(self, language: str) -> None:
-        """Handles the language code.
-
-        Args:
-            language (str): The language in which speech will be synthesized.
-        """
-
-        if language == "nl":
-            raise ValueError(f"Language code {language} is not a supported language for the Parler TTS Model.")
