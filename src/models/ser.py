@@ -8,7 +8,6 @@ import torch
 from transformers import pipeline
 import requests
 import os
-from num2words import num2words
 
 # Allows AbstractModel to be imported in both src and eval folders
 try:
@@ -102,7 +101,7 @@ class RAVDESS(SERModel):
         label = result[0]['label']
         score = int(result[0]['score'] * 100)
         last_label = "disgusted" if result[-1]['label'] == "disgust" else result[-1]['label']
-        return label, num2words(score), last_label
+        return label, score, last_label
 
     def warmup(self):
         """Loads the SER model into memory so that it can be swiftly accessed during actual inference."""

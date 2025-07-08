@@ -132,7 +132,18 @@ class MMS(TTSModel):
         with torch.no_grad():
             speech = model(**tokenized_input).waveform.cpu()
         
-        torchaudio.save(str(self.path_to_temp_tts), speech, model.config.sampling_rate)
+        path_to_temp_wav = str(Path(self.path_to_temp_tts.parents[0], "temp_tts.wav"))
+        
+        torchaudio.save(path_to_temp_wav, speech, model.config.sampling_rate)
+
+        audio = pydub.AudioSegment.from_wav(path_to_temp_wav)
+
+        if os.path.exists(self.path_to_temp_tts):
+            audio_pre = pydub.AudioSegment.from_mp3(str(self.path_to_temp_tts))
+            audio = audio_pre + audio
+
+        audio.export(self.path_to_temp_tts, format="mp3")
+        os.remove(path_to_temp_wav)
         
         temp_tts_info = torchaudio.info(str(self.path_to_temp_tts))
         audio_length = temp_tts_info.num_frames / temp_tts_info.sample_rate
@@ -208,7 +219,13 @@ class Piper(TTSModel):
         with wave.open(path_to_temp_wav, mode="wb") as temp_tts_wav:
             model.synthesize(text, temp_tts_wav, voice_id)
         
-        pydub.AudioSegment.from_wav(path_to_temp_wav).export(self.path_to_temp_tts, format="mp3")
+        audio = pydub.AudioSegment.from_wav(path_to_temp_wav)
+
+        if os.path.exists(self.path_to_temp_tts):
+            audio_pre = pydub.AudioSegment.from_mp3(str(self.path_to_temp_tts))
+            audio = audio_pre + audio
+
+        audio.export(self.path_to_temp_tts, format="mp3")
         os.remove(path_to_temp_wav)
         
         temp_tts_info = torchaudio.info(self.path_to_temp_tts)

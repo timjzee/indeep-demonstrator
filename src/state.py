@@ -12,6 +12,18 @@ import torch
 
 import demonstrator
 import rest_api
+from num2words import num2words
+
+emo_dict = {
+    "neutral": "neutraal",
+    "happy": "blij",
+    "sad": "verdrietig",
+    "angry": "boos",
+    "fearful": "bang",
+    "disgusted": "walgend",
+    "surprised": "verbaasd",
+    "calm": "kalm",
+}
 
 class AbstractState(ABC):
     """The abstract base state all other states inherit from.
@@ -176,9 +188,15 @@ class RecognizeEmo(AbstractState):
         emo_label, emo_score, oth_label = context.ser_model.recognize(context.latest_user_utterance)
         
         context.latest_emo_label = emo_label
-        context.latest_emo_score = emo_score
-        context.latest_other_label = oth_label if context.tts_model.name == "parler" else "neutral"
-        context.latest_text_to_synthesize = "I am {} percent certain that you sounded {}. If you were {} instead, you would have sounded like this:".format(emo_score, emo_label, oth_label)
+        context.latest_emo_score = num2words(emo_score)
+        context.latest_other_label = oth_label if context.tts_model.name == "parler" else "calm" if emo_label == "neutral" else "neutral"
+        if context.TTS_language == "nl":
+            context.latest_emo_score = num2words(emo_score, lang="nl")
+            context.latest_emo_label = emo_dict[emo_label]
+            context.latest_other_label = emo_dict[context.latest_other_label]
+            context.latest_text_to_synthesize = "Ik ben {} procent zeker dat je {} klonk. Als je in plaats daarvan {} was, zou je zo hebben geklonken:".format(context.latest_emo_score, context.latest_emo_label, context.latest_other_label)
+        else:
+            context.latest_text_to_synthesize = "I am {} percent certain that you sounded {}. If you were {} instead, you would have sounded like this:".format(context.latest_emo_score, context.latest_emo_label, context.latest_other_label)
 
         context.state = Synthesize()
 
