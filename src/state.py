@@ -54,9 +54,37 @@ class Idle(AbstractState):
 
         print("I'm idle...")
 
-        input("Press Enter to continue...")
+        input_text = input("Press Enter to continue...")
         
-        context.state = Listen()
+        if input_text == "n":
+            context.asr_model.language = "nl"
+            context.TTS_language = "nl"
+            context.state = Intro()
+        elif input_text == "e":
+            context.asr_model.language = "en"
+            context.TTS_language = "en"
+            context.state = Intro()
+        else:
+            context.asr_model.language = None
+            context.state = Listen()
+
+class Intro(AbstractState):
+    """Introduces the demonstrator."""
+
+    def handle(self, context: demonstrator.Demonstrator):
+        """Runs the state's logic."""
+        if context.TTS_language == "nl":
+            intro_text = "Hallo, ik ben de InDiep demo! Zeg iets met emotie, en ik probeer te raden welke emotie het was."
+        elif context.TTS_language == "en":
+            intro_text = "Hi, I am the InDeep demo! Please say something with emotion, and I'll try to guess which emotion it was."
+    
+        audio_length = context.tts_model.synthesize(intro_text, "neutral", context.TTS_language)
+        
+        if isinstance(context, demonstrator.DemonstratorServer):
+            context.state = RESTResponse()
+            
+        if isinstance(context, demonstrator.DemonstratorApp):
+            context.state = Speak()
 
 class Wakeup(AbstractState):
     """The initial state all Demonstrator instances start in, which assigns the first state with logic to the instance."""
@@ -194,9 +222,9 @@ class RecognizeEmo(AbstractState):
             context.latest_emo_score = num2words(emo_score, lang="nl")
             context.latest_emo_label = emo_dict[emo_label]
             context.latest_other_label = emo_dict[context.latest_other_label]
-            context.latest_text_to_synthesize = "Ik ben {} procent zeker dat je {} klonk. Als je in plaats daarvan {} was, zou je zo hebben geklonken:".format(context.latest_emo_score, context.latest_emo_label, context.latest_other_label)
+            context.latest_text_to_synthesize = "Op basis van je stem ben ik {} procent zeker dat je {} klonk. Als je in plaats daarvan {} was, zou je zo hebben geklonken:".format(context.latest_emo_score, context.latest_emo_label, context.latest_other_label)
         else:
-            context.latest_text_to_synthesize = "I am {} percent certain that you sounded {}. If you were {} instead, you would have sounded like this:".format(context.latest_emo_score, context.latest_emo_label, context.latest_other_label)
+            context.latest_text_to_synthesize = "Based on your tone of voice, I am {} percent certain that you sounded {}. If you were {} instead, you would have sounded like this:".format(context.latest_emo_score, context.latest_emo_label, context.latest_other_label)
 
         context.state = Synthesize()
 
@@ -217,7 +245,7 @@ class Synthesize(AbstractState):
         print("I'm synthesizing speech...")
         
         starting_timestamp = time.time()
-        audio_length = context.fast_tts_model.synthesize(context.latest_text_to_synthesize, "neutral", context.TTS_language) # could be changed to a faster tts mode, context.fast_tts_model
+        audio_length = context.tts_model.synthesize(context.latest_text_to_synthesize, "neutral", context.TTS_language) # could be changed to a faster tts mode, context.fast_tts_model
         audio_length = context.tts_model.synthesize(context.latest_transcription, context.latest_other_label, context.TTS_language)
         ending_timestamp = time.time()
         
