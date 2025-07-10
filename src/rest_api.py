@@ -6,7 +6,7 @@ import shutil
 import time
 
 import requests
-from fastapi import FastAPI, UploadFile, status
+from fastapi import FastAPI, UploadFile, Form, status
 from fastapi.responses import FileResponse
 
 import demonstrator
@@ -51,7 +51,7 @@ def _API_root() -> dict:
     return {"message": "Successfully connected to the server. Hello World!"}
 
 @fast_api.post("/user-speech")
-def _API_user_speech(user_utterance: UploadFile, read_intro: bool, TTS_language: str) -> FileResponse:
+def _API_user_speech(user_utterance: UploadFile, read_intro: bool = Form(...), TTS_language: str = Form(...)) -> FileResponse:
     """Endpoint of the API that receives user utterances.
 
     Endpoint of the API that receives user utterances.
