@@ -85,17 +85,16 @@ class FasterWhisper(ASRModel):
         else:
             self.model = faster_whisper.WhisperModel(self.model_size, device=device, compute_type="float32")
         
-        if self.language:
-            tokenizer = {
-                "en": faster_whisper.tokenizer.Tokenizer(tokenizer=self.model.hf_tokenizer, task="transcribe", language="en", multilingual=True),
-                "nl": faster_whisper.tokenizer.Tokenizer(tokenizer=self.model.hf_tokenizer, task="transcribe", language="nl", multilingual=True)
-                }
+        tokenizer = {
+            "en": faster_whisper.tokenizer.Tokenizer(tokenizer=self.model.hf_tokenizer, task="transcribe", language="en", multilingual=True),
+            "nl": faster_whisper.tokenizer.Tokenizer(tokenizer=self.model.hf_tokenizer, task="transcribe", language="nl", multilingual=True)
+            }
 
-            # Encourages FasterWhisper to transcribe numbers as words, so that the TTS can read them out loud
-            self.number_tokens = {
-                "en": [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer["en"].decode([i]).removeprefix(" "))],
-                "nl": [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer["nl"].decode([i]).removeprefix(" "))]
-                }
+        # Encourages FasterWhisper to transcribe numbers as words, so that the TTS can read them out loud
+        self.number_tokens = {
+            "en": [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer["en"].decode([i]).removeprefix(" "))],
+            "nl": [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer["nl"].decode([i]).removeprefix(" "))]
+            }
     
     def transcribe(self, audio: torch.Tensor | Path | str, print_transcription: bool = True) -> tuple[str, float]:
         """Transcribes a user utterance using the FasterWhisper model.

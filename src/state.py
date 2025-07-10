@@ -13,6 +13,8 @@ import torch
 import demonstrator
 import rest_api
 from num2words import num2words
+from pydub import AudioSegment
+from pathlib import Path
 
 emo_dict = {
     "neutral": "neutraal",
@@ -57,15 +59,12 @@ class Idle(AbstractState):
         input_text = input("Press Enter to continue...")
         
         if input_text == "n":
-            context.asr_model.language = "nl"
             context.TTS_language = "nl"
             context.state = Intro()
         elif input_text == "e":
-            context.asr_model.language = "en"
             context.TTS_language = "en"
             context.state = Intro()
         else:
-            context.asr_model.language = None
             context.state = Listen()
 
 class Intro(AbstractState):
@@ -73,18 +72,28 @@ class Intro(AbstractState):
 
     def handle(self, context: demonstrator.Demonstrator):
         """Runs the state's logic."""
-        if context.TTS_language == "nl":
-            intro_text = "Hallo, ik ben de InDiep demo! Zeg iets met emotie, en ik probeer te raden welke emotie het was."
-        elif context.TTS_language == "en":
-            intro_text = "Hi, I am the InDeep demo! Please say something with emotion, and I'll try to guess which emotion it was."
-    
-        audio_length = context.tts_model.synthesize(intro_text, "neutral", context.TTS_language)
+
+        # Create dummy audio. then serverside skip asr and tts intro text based on read_intro flag.
+        path_to_resources = Path(Path(__file__).parents[1], "resources")
+        path_to_temp_user_utterance = Path(path_to_resources, "audio", f"temp_user_utterance.mp3")
+        silent = AudioSegment.silent(duration=50)
+        silent.export(path_to_temp_user_utterance, format="mp3", bitrate="32k")
+
+        context.latest_user_utterance = path_to_temp_user_utterance
+        context.read_intro = True
+
+        if isinstance(context, demonstrator.DemonstratorClient):
+            context.state = RESTRequest()
         
-        if isinstance(context, demonstrator.DemonstratorServer):
-            context.state = RESTResponse()
-            
         if isinstance(context, demonstrator.DemonstratorApp):
+            if context.TTS_language == "nl":
+                intro_text = "Hallo, ik ben de InDiep demo! Zeg iets met emotie, en ik probeer te raden welke emotie het was."
+            elif context.TTS_language == "en":
+                intro_text = "Hi, I am the InDeep demo! Please say something with emotion, and I'll try to guess which emotion it was."
+            
+            audio_length = context.tts_model.synthesize(intro_text, "neutral", context.TTS_language)
             context.state = Speak()
+
 
 class Wakeup(AbstractState):
     """The initial state all Demonstrator instances start in, which assigns the first state with logic to the instance."""
@@ -176,7 +185,24 @@ class Transcribe(AbstractState):
         """
 
         print("I'm transcribing...")
-        
+
+        if context.read_intro:  # if intro, we skip the ASR and TTS intro text
+            # Set model language for future transcriptions
+            context.asr_model.language = context.TTS_language
+            context.read_intro = False
+            if context.TTS_language == "nl":
+                intro_text = "Hallo, ik ben de InDiep demo! Zeg iets met emotie, en ik probeer te raden welke emotie het was."
+            elif context.TTS_language == "en":
+                intro_text = "Hi, I am the InDeep demo! Please say something with emotion, and I'll try to guess which emotion it was."
+            
+            audio_length = context.tts_model.synthesize(intro_text, "neutral", context.TTS_language)
+
+            if isinstance(context, demonstrator.DemonstratorServer):
+                context.state = RESTResponse()
+            
+            if isinstance(context, demonstrator.DemonstratorApp):
+                context.state = Speak()
+
         starting_timestamp = time.time()
         transcription, audio_length, recog_lang = context.asr_model.transcribe(context.latest_user_utterance)
         ending_timestamp = time.time()
