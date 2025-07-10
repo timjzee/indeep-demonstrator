@@ -66,6 +66,7 @@ class Idle(AbstractState):
             context.state = Intro()
         else:
             context.state = Listen()
+            context.read_intro = False
 
 class Intro(AbstractState):
     """Introduces the demonstrator."""
@@ -197,6 +198,8 @@ class Transcribe(AbstractState):
                 intro_text = "Hi, I am the InDeep demo! Please say something with emotion, and I'll try to guess which emotion it was."
             
             audio_length = context.tts_model.synthesize(intro_text, "neutral", context.TTS_language)
+            context.latest_tts_audio_length = audio_length
+            context.latest_transcription = intro_text
 
             if isinstance(context, demonstrator.DemonstratorServer):
                 context.state = RESTResponse()
