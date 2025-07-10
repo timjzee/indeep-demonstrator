@@ -207,27 +207,28 @@ class Transcribe(AbstractState):
             
             if isinstance(context, demonstrator.DemonstratorApp):
                 context.state = Speak()
-
-        starting_timestamp = time.time()
-        transcription, audio_length, recog_lang = context.asr_model.transcribe(context.latest_user_utterance)
-        ending_timestamp = time.time()
         
-        context.asr_model.metric_tracker.calculate_rtf(starting_timestamp, ending_timestamp, audio_length)        
-        context.latest_transcription = transcription
-        context.TTS_language = recog_lang
-        
-        preprocessed_transcription = copy.copy(transcription)
-        preprocessed_transcription = preprocessed_transcription.strip().lower()
-        preprocessed_transcription = preprocessed_transcription.translate(str.maketrans("", "", string.punctuation))
-        
-        # here we remove temporary tts file so the tts module knows whether to concatenate synthesized audio to the existing one or not
-        if os.path.exists(context.tts_model.path_to_temp_tts):
-            os.remove(context.tts_model.path_to_temp_tts)
-
-        if preprocessed_transcription == context.asr_model.goodbye_transcription:
-            context.state = SayGoodbye()
         else:
-            context.state = RecognizeEmo()
+            starting_timestamp = time.time()
+            transcription, audio_length, recog_lang = context.asr_model.transcribe(context.latest_user_utterance)
+            ending_timestamp = time.time()
+            
+            context.asr_model.metric_tracker.calculate_rtf(starting_timestamp, ending_timestamp, audio_length)        
+            context.latest_transcription = transcription
+            context.TTS_language = recog_lang
+            
+            preprocessed_transcription = copy.copy(transcription)
+            preprocessed_transcription = preprocessed_transcription.strip().lower()
+            preprocessed_transcription = preprocessed_transcription.translate(str.maketrans("", "", string.punctuation))
+            
+            # here we remove temporary tts file so the tts module knows whether to concatenate synthesized audio to the existing one or not
+            if os.path.exists(context.tts_model.path_to_temp_tts):
+                os.remove(context.tts_model.path_to_temp_tts)
+
+            if preprocessed_transcription == context.asr_model.goodbye_transcription:
+                context.state = SayGoodbye()
+            else:
+                context.state = RecognizeEmo()
 
 class RecognizeEmo(AbstractState):
     """Instructs the Demonstrator instance to recognize the emotion of a user utterance.
