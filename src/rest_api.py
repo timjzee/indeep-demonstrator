@@ -25,7 +25,9 @@ def send_user_speech_request(client: demonstrator.DemonstratorClient) -> tuple[f
     with open(client.vad_model.path_to_temp_user_utterance, "rb") as user_utterance_stream:        
         response = requests.post(
             url=f"{client.api_url}/user-speech",
-            files={"user_utterance": ("temp_user_utterance.mp3", user_utterance_stream, "audio/mpeg")}
+            files={"user_utterance": ("temp_user_utterance.mp3", user_utterance_stream, "audio/mpeg")},
+            data={"read_intro": client.read_intro, 
+                  "TTS_language": client.TTS_language},
         )
         
         with open(client.playback_module.path_to_temp_tts, "wb+") as temp_tts_stream:
@@ -49,7 +51,7 @@ def _API_root() -> dict:
     return {"message": "Successfully connected to the server. Hello World!"}
 
 @fast_api.post("/user-speech")
-def _API_user_speech(user_utterance: UploadFile) -> FileResponse:
+def _API_user_speech(user_utterance: UploadFile, read_intro: bool, TTS_language: str) -> FileResponse:
     """Endpoint of the API that receives user utterances.
 
     Endpoint of the API that receives user utterances.
@@ -67,6 +69,8 @@ def _API_user_speech(user_utterance: UploadFile) -> FileResponse:
         shutil.copyfileobj(user_utterance.file, user_utterance_stream)
 
     fast_api.demonstrator.latest_user_utterance = fast_api.demonstrator.asr_model.path_to_temp_user_utterance
+    fast_api.demonstrator.read_intro = read_intro
+    fast_api.demonstrator.TTS_language = TTS_language
         
     while not fast_api.demonstrator.passed_server_response_barrier:
         time.sleep(.1)

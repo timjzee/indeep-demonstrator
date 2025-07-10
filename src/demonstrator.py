@@ -33,6 +33,7 @@ class Demonstrator(ABC):
         self.latest_emo_score: float
         self.latest_other_label: str
         self.TTS_language: str = None
+        self.read_intro: bool = False
     
     def run(self) -> None:
         """Continuously runs a Demonstrator's current state logic.
