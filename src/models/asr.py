@@ -92,8 +92,8 @@ class FasterWhisper(ASRModel):
 
         # Encourages FasterWhisper to transcribe numbers as words, so that the TTS can read them out loud
         self.number_tokens = {
-            "en": [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer["en"].decode([i]).removeprefix(" "))],
-            "nl": [i for i in range(tokenizer.eot) if all(char in "0123456789" for char in tokenizer["nl"].decode([i]).removeprefix(" "))]
+            "en": [i for i in range(tokenizer["en"].eot) if all(char in "0123456789" for char in tokenizer["en"].decode([i]).removeprefix(" "))],
+            "nl": [i for i in range(tokenizer["nl"].eot) if all(char in "0123456789" for char in tokenizer["nl"].decode([i]).removeprefix(" "))]
             }
     
     def transcribe(self, audio: torch.Tensor | Path | str, print_transcription: bool = True) -> tuple[str, float]:
