@@ -190,6 +190,9 @@ class Transcribe(AbstractState):
         print("Intro: ", context.read_intro)
 
         if context.read_intro:  # if intro, we skip the ASR and TTS intro text
+            # remove previous tts audio
+            if os.path.exists(context.tts_model.path_to_temp_tts):
+                os.remove(context.tts_model.path_to_temp_tts)
             # Set model language for future transcriptions
             context.asr_model.language = context.TTS_language
             context.read_intro = False
