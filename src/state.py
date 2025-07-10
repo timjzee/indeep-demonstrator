@@ -77,6 +77,7 @@ class Intro(AbstractState):
         path_to_resources = Path(Path(__file__).parents[1], "resources")
         path_to_temp_user_utterance = Path(path_to_resources, "audio", f"temp_user_utterance.mp3")
         silent = AudioSegment.silent(duration=50)
+        os.makedirs(os.path.dirname(path_to_temp_user_utterance), exist_ok=True)
         silent.export(path_to_temp_user_utterance, format="mp3", bitrate="32k")
 
         context.latest_user_utterance = path_to_temp_user_utterance
