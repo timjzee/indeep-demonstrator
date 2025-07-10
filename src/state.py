@@ -187,6 +187,7 @@ class Transcribe(AbstractState):
         """
 
         print("I'm transcribing...")
+        print("Intro: ", context.read_intro)
 
         if context.read_intro:  # if intro, we skip the ASR and TTS intro text
             # Set model language for future transcriptions
@@ -359,6 +360,8 @@ class RESTRequest(AbstractState):
 
         print("I'm sending a REST request to the server...")
         
+        print("Intro: ")
+        print(context.read_intro)
         audio_length, transcription = rest_api.send_user_speech_request(context)
         context.latest_tts_audio_length = audio_length
         print(f"{transcription}")
