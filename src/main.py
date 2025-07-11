@@ -16,6 +16,7 @@ import uvicorn
 import runtime
 import rest_api
 from demonstrator import DemonstratorFactory, DemonstratorServer, DemonstratorClient
+import ssl
 
 PROJECT_ROOT = Path(__file__).parents[1]
 DOT_ENV_PATH = Path(PROJECT_ROOT, ".env")
@@ -29,6 +30,10 @@ if __name__ == "__main__":
         
     mode = os.getenv("DEMONSTRATOR_MODE").strip()
     profile = os.getenv("DEMONSTRATOR_PROFILE").strip()
+
+    if os.name == 'nt':
+        # Disable SSL verification on Windows to avoid certificate issues
+        ssl._create_default_https_context = ssl._create_unverified_context
     
     print(f"Starting Demonstrator in {mode} mode using {profile} profile.")
     

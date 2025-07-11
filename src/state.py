@@ -75,7 +75,7 @@ class Intro(AbstractState):
         """Runs the state's logic."""
 
         # Create dummy audio. then serverside skip asr and tts intro text based on read_intro flag.
-        path_to_resources = Path(Path(__file__).parents[1], "resources")
+        path_to_resources = Path(Path(__file__), "resources")
         path_to_temp_user_utterance = Path(path_to_resources, "audio", f"temp_user_utterance.mp3")
         silent = AudioSegment.silent(duration=50)
         os.makedirs(os.path.dirname(path_to_temp_user_utterance), exist_ok=True)
