@@ -97,7 +97,10 @@ class RAVDESS(SERModel):
         np_waveform = waveform.squeeze().numpy()
 
         result = self.classifier(np_waveform, top_k=8)
-        print(result)
+        print("\nEmotion Recognition Results:\n")
+        for r in result:
+            print(f"{r['label']}: {r['score']:.2f}")
+        #print(result)
         label = result[0]['label']
         score = int(result[0]['score'] * 100)
         last_label = "disgusted" if result[-1]['label'] == "disgust" else result[-1]['label']
