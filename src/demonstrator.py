@@ -34,6 +34,7 @@ class Demonstrator(ABC):
         self.latest_other_label: str
         self.TTS_language: str = None
         self.read_intro: bool = False
+        self.emo_list: list[str] = ["neutral", "happy", "sad", "angry", "fearful", "disgusted", "surprised"]
     
     def run(self) -> None:
         """Continuously runs a Demonstrator's current state logic.

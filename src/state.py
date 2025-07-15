@@ -3,6 +3,7 @@
 from __future__ import annotations
 import sys
 import os
+import random
 import string
 import time
 import copy
@@ -60,9 +61,11 @@ class Idle(AbstractState):
         
         if input_text == "n":
             context.TTS_language = "nl"
+            context.emo_list = list(emo_dict.values())
             context.state = Intro()
         elif input_text == "e":
             context.TTS_language = "en"
+            context.emo_list = list(emo_dict.keys())
             context.state = Intro()
         else:
             context.state = Listen()
@@ -282,6 +285,22 @@ class Synthesize(AbstractState):
         starting_timestamp = time.time()
         audio_length = context.tts_model.synthesize(context.latest_text_to_synthesize, "neutral", context.TTS_language) # could be changed to a faster tts mode, context.fast_tts_model
         audio_length = context.tts_model.synthesize(context.latest_transcription, context.latest_other_label, context.TTS_language)
+
+        # select emo suggestion
+        context.emo_list.remove(context.latest_emo_label) if context.latest_emo_label in context.emo_list else None
+        if len(context.emo_list) == 0:
+            context.emo_list = list(emo_dict.keys()) if context.TTS_language == "en" else list(emo_dict.values())
+            context.emo_list.remove(context.latest_emo_label)
+        emo_sug = random.choice(context.emo_list)
+        context.emo_list.remove(emo_sug)
+        if context.TTS_language == "nl":
+            if emo_sug == "walgend":
+                audio_length = context.tts_model.synthesize("Probeer nu eens vol walging te klinken.", "neutral", context.TTS_language)
+            else:
+                audio_length = context.tts_model.synthesize("Probeer nu eens heel {} te klinken.".format(emo_sug), "neutral", context.TTS_language)
+        else:
+             audio_length = context.tts_model.synthesize("Now try to sound very {}.".format(emo_sug), "neutral", context.TTS_language)
+
         ending_timestamp = time.time()
         
         context.tts_model.metric_tracker.calculate_rtf(starting_timestamp, ending_timestamp, audio_length)
@@ -366,8 +385,9 @@ class RESTRequest(AbstractState):
         
         print("Intro: ")
         print(context.read_intro)
-        audio_length, transcription = rest_api.send_user_speech_request(context)
+        audio_length, transcription, emotion = rest_api.send_user_speech_request(context)
         context.latest_tts_audio_length = audio_length
+        context.latest_emo_label = emotion
         print(f"{transcription}")
         
         context.state = Speak()
