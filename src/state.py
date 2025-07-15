@@ -385,9 +385,8 @@ class RESTRequest(AbstractState):
         
         print("Intro: ")
         print(context.read_intro)
-        audio_length, transcription, emotion = rest_api.send_user_speech_request(context)
+        audio_length, transcription = rest_api.send_user_speech_request(context)
         context.latest_tts_audio_length = audio_length
-        context.latest_emo_label = emotion
         print(f"{transcription}")
         
         context.state = Speak()
