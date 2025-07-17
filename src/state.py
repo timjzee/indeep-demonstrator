@@ -292,6 +292,8 @@ class Synthesize(AbstractState):
             context.emo_list = list(emo_dict.keys()) if context.TTS_language == "en" else list(emo_dict.values())
             context.emo_list.remove(context.latest_emo_label)
 
+        print("Emo list: ", context.emo_list)
+        print(context.TTS_language)
         emo_sug = random.choice(context.emo_list)
         context.emo_list.remove(emo_sug)
         if context.TTS_language == "nl":
