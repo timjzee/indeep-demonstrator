@@ -62,10 +62,12 @@ class Idle(AbstractState):
         if input_text == "n":
             context.TTS_language = "nl"
             context.emo_list = list(emo_dict.values())
+            print("Emo list: ", context.emo_list)
             context.state = Intro()
         elif input_text == "e":
             context.TTS_language = "en"
             context.emo_list = list(emo_dict.keys())
+            print("Emo list: ", context.emo_list)
             context.state = Intro()
         else:
             context.state = Listen()
