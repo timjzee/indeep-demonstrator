@@ -61,13 +61,9 @@ class Idle(AbstractState):
         
         if input_text == "n":
             context.TTS_language = "nl"
-            context.emo_list = list(emo_dict.values())
-            print("Emo list: ", context.emo_list)
             context.state = Intro()
         elif input_text == "e":
             context.TTS_language = "en"
-            context.emo_list = list(emo_dict.keys())
-            print("Emo list: ", context.emo_list)
             context.state = Intro()
         else:
             context.state = Listen()
@@ -95,8 +91,10 @@ class Intro(AbstractState):
         if isinstance(context, demonstrator.DemonstratorApp):
             if context.TTS_language == "nl":
                 intro_text = "Hallo, ik ben de InDiep demo! Zeg iets met emotie, en ik probeer te raden welke emotie het was."
+                context.emo_list = list(emo_dict.values())
             elif context.TTS_language == "en":
                 intro_text = "Hi, I am the InDeep demo! Please say something with emotion, and I'll try to guess which emotion it was."
+                context.emo_list = list(emo_dict.keys())
             
             audio_length = context.tts_model.synthesize(intro_text, "neutral", context.TTS_language)
             context.state = Speak()
@@ -203,8 +201,10 @@ class Transcribe(AbstractState):
             context.read_intro = False
             if context.TTS_language == "nl":
                 intro_text = "Hallo, ik ben de InDiep demo! Zeg iets met emotie, en ik probeer te raden welke emotie het was."
+                context.emo_list = list(emo_dict.values())
             elif context.TTS_language == "en":
                 intro_text = "Hi, I am the InDeep demo! Please say something with emotion, and I'll try to guess which emotion it was."
+                context.emo_list = list(emo_dict.keys())
             
             audio_length = context.tts_model.synthesize(intro_text, "neutral", context.TTS_language)
             context.latest_tts_audio_length = audio_length
@@ -294,8 +294,6 @@ class Synthesize(AbstractState):
             context.emo_list = list(emo_dict.keys()) if context.TTS_language == "en" else list(emo_dict.values())
             context.emo_list.remove(context.latest_emo_label)
 
-        print("Emo list: ", context.emo_list)
-        print(context.TTS_language)
         emo_sug = random.choice(context.emo_list)
         context.emo_list.remove(emo_sug)
         if context.TTS_language == "nl":
