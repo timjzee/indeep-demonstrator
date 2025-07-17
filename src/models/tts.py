@@ -223,7 +223,8 @@ class Piper(TTSModel):
 
         if os.path.exists(self.path_to_temp_tts):
             audio_pre = pydub.AudioSegment.from_mp3(str(self.path_to_temp_tts))
-            audio = audio_pre + audio
+            silence = pydub.AudioSegment.silent(duration=500)
+            audio = audio_pre + silence + audio
 
         audio.export(self.path_to_temp_tts, format="mp3")
         os.remove(path_to_temp_wav)
