@@ -26,7 +26,7 @@ Make sure Windows uses the **Motu** as the input and the speakers as the output.
 
 ## Software
 
-Make sure the laptop is connected to the Radboud Network (through eduVPN Client, shortcut on the desktop).
+Make sure the laptop is connected to the Radboud Network (through eduVPN Client, shortcut on the desktop). See instructions below if you do not have access to Radboud Network over VPN.
 
 Open up two Command Prompt windows. One will run the client-side application and the other will run the server-side application
 
