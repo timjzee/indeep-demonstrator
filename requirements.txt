@@ -26,3 +26,5 @@ uvicorn==0.32.0
 num2words==0.5.14
 pyobjc==11.0; sys_platform == "darwin"
 git+https://github.com/huggingface/parler-tts.git
+pycairo==1.28.0
+PyGObject==3.50.0
