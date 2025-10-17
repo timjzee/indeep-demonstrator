@@ -3,6 +3,7 @@
 import os
 import time
 from pathlib import Path
+import threading
 
 from playsound import playsound
 
@@ -25,7 +26,10 @@ class PlaybackModule:
             audio_length (float): The length of the temporarily stored TTS utterance in seconds.
         """
 
-        playsound(str(self.path_to_temp_tts), block=False)
+        print("=================================SUCCESS==========================================")
+        threading.Thread(target=playsound, args=(str(self.path_to_temp_tts),)).start()
+        # An alternative to threading is to use playsound directly (does not work on Linux):
+        # playsound(str(self.path_to_temp_tts), block=False)
         time.sleep(audio_length)
         os.remove(self.path_to_temp_tts)
         
