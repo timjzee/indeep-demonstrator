@@ -105,6 +105,7 @@ class RAVDESS(SERModel):
                 print(f"{r['label']}: \t\t{r['score']:.2f}")
         print("\n")
         label = result[0]['label']
+        label = "disgusted" if label == "disgust" else label
         score = int(result[0]['score'] * 100)
         last_label = "disgusted" if result[-1]['label'] == "disgust" else result[-1]['label']
         return label, score, last_label
